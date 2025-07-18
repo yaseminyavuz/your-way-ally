@@ -54,7 +54,6 @@ Developer: Yasemin Yavuz
 GitHub: @yaseminyavuz
 ## Ekran Görüntüleri
 
-<img src="https://github.com/yaseminyavuz/your-way-ally/blob/main/assets/Your Way Ally_.png?raw=true" width="500" alt="Ana Sayfa Görseli">
 
 
 
