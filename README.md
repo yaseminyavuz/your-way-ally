@@ -52,6 +52,5 @@ Auth: JWT tokens with BCrypt
 📞 Contact
 Developer: Yasemin Yavuz
 GitHub: @yaseminyavuz
-<img width="1024" height="1536" alt="Your way ally" src="https://github.com/user-attachments/assets/21ed3d10-74fb-41dc-b37b-0c08dfe955b5" />
-<img width="1261" height="926" alt="Your Way Ally_" src="https://github.com/user-attachments/assets/2f3b0aa6-1bc6-45fb-9e1d-e2da86eb3ee2" />
+
 
