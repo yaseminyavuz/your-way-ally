@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Way Ally - AI Travel Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .plan-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .chat-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .quick-plans {
+            margin-bottom: 30px;
+        }
+
+        .quick-plans h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .plan-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .plan-card h4 {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .plan-card p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .plan-details {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .plan-details.active {
+            display: block;
+        }
+
+        .day-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .day-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .day-activity {
+            margin: 8px 0;
+            color: #555;
+            padding-left: 15px;
+        }
+
+        .budget-section {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .budget-section h4 {
+            margin-bottom: 15px;
+        }
+
+        .budget-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            opacity: 0.95;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            max-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 85%;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+            white-space: pre-line;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-messages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quick-msg {
+            background: #e9ecef;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .quick-msg:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .tips {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .tips h4 {
+            color: #8b4513;
+            margin-bottom: 15px;
+        }
+
+        .tip-item {
+            color: #654321;
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .tip-item:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+                height: auto;
+            }
+
+            .plan-section {
+                order: 2;
+            }
+
+            .chat-section {
+                order: 1;
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sol taraf: Seyahat Planları -->
+        <div class="plan-section">
+            <div class="header">
+                <h1>🌍 Your Way Ally</h1>
+                <p>AI destekli seyahat planlama asistanınız</p>
+            </div>
+
+            <div class="quick-plans">
+                <h3>🚀 Hazır Planlar</h3>
+                <div class="plan-card" onclick="loadPlan('baku_5_days')">
+                    <h4>🇦🇿 Bakü - 5 Gün</h4>
+                    <p>Modern mimari, tarihi yerler ve Hazar Denizi</p>
+                </div>
+                <div class="plan-card" onclick="loadPlan('istanbul_3_days')">
+                    <h4>🇹🇷 İstanbul - 3 Gün</h4>
+                    <p>İki kıta arasında büyülü bir macera</p>
+                </div>
+            </div>
+
+            <div id="plan-details" class="plan-details">
+                <p style="text-align: center; color: #666; padding: 40px;">
+                    👆 Yukarıdaki planlardan birini seçin veya chatbot'a yazın!
+                </p>
+            </div>
+        </div>
+
+        <!-- Sağ taraf: Chatbot -->
+        <div class="chat-section">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #333;">🤖 AI Asistan</h3>
+
+            <div class="quick-messages">
+                <div class="quick-msg" onclick="sendQuickMessage('Merhaba!')">👋 Merhaba</div>
+                <div class="quick-msg" onclick="sendQuickMessage('Bakü\'ye 5 gün gitmek istiyorum')">🇦🇿 Bakü</div>
+                <div class="quick-msg" onclick="sendQuickMessage('İstanbul\'da 3 gün kalacağım')">🇹🇷 İstanbul</div>
+            </div>
+
+            <div id="chat-messages" class="chat-messages">
+                <div class="message bot-message">
+                    Merhaba! 👋 Size harika seyahat planları hazırlayabilirim!
+
+                    Hangi şehre seyahat etmek istiyorsunuz? 🌍
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Mesajınızı yazın..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" class="send-btn">Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Kullanıcı mesajını ekle
+            addMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                // Bot yanıtını ekle
+                addMessage(data.response, 'bot');
+
+                // Eğer detaylı plan varsa, otomatik yükle
+                if (data.plan_id) {
+                    setTimeout(() => loadPlan(data.plan_id), 1000);
+                }
+
+            } catch (error) {
+                addMessage('Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.', 'bot');
+                console.error('Error:', error);
+            }
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('chat-input').value = message;
+            sendMessage();
+        }
+
+        function addMessage(message, type) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = message;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function loadPlan(planId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/plan/${planId}`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayPlan(data.plan);
+                }
+            } catch (error) {
+                console.error('Plan yüklenirken hata:', error);
+            }
+        }
+
+        function displayPlan(plan) {
+            const planDetails = document.getElementById('plan-details');
+
+            let html = `
+                <h3 style="color: #333; margin-bottom: 20px;">📋 ${plan.destination} - ${plan.days} Günlük Plan</h3>
+            `;
+
+            // Günlük planlar
+            Object.entries(plan.plan).forEach(([dayKey, dayData]) => {
+                html += `
+                    <div class="day-item">
+                        <div class="day-title">📅 ${dayKey.replace('_', '. ').toUpperCase()}: ${dayData.title}</div>
+                        <div class="day-activity">🌅 Sabah: ${dayData.morning}</div>
+                        <div class="day-activity">☀️ Öğleden sonra: ${dayData.afternoon}</div>
+                        <div class="day-activity">🌙 Akşam: ${dayData.evening}</div>
+                        <div style="margin-top: 10px; font-size: 0.9em; color: #667eea;">
+                            ✨ Öne çıkanlar: ${dayData.highlights.join(', ')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Bütçe bölümü
+            html += `
+                <div class="budget-section">
+                    <h4>💰 Tahmini Bütçe Rehberi</h4>
+                    ${Object.entries(plan.budget).map(([key, value]) =>
+                        `<div class="budget-item">
+                            <span>${getBudgetLabel(key)}:</span>
+                            <span>${value}</span>
+                        </div>`
+                    ).join('')}
+                </div>
+            `;
+
+            // İpuçları
+            if (plan.tips) {
+                html += `
+                    <div class="tips">
+                        <h4>🎯 İpuçları</h4>
+                        ${plan.tips.map(tip => `<div class="tip-item">${tip}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            planDetails.innerHTML = html;
+            planDetails.classList.add('active');
+        }
+
+        function getBudgetLabel(key) {
+            const labels = {
+                accommodation: '🏨 Konaklama',
+                food: '🍽️ Yemek',
+                transport: '🚗 Ulaşım',
+                activities: '🎭 Aktiviteler'
+            };
+            return labels[key] || key;
+        }
+
+        // Sayfa yüklendiğinde hoş geldin mesajı
+        window.addEventListener('load', () => {
+            console.log('Your Way Ally yüklendi! 🚀');
+        });
+    </script>
+</body>
+</html>
